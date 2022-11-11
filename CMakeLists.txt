@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.20)
 project(z_fft LANGUAGES C)
 
+add_definitions(-DBASIC_TYPE=double)
+
 add_library(fft SHARED
     fft.c
 )

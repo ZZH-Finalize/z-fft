@@ -4,30 +4,33 @@
 @time: 2022-11-05 17:10:13
 @info: fft实现
 */
-#include"fft.h"
+#include "fft.h"
 
 const double PI_2 = 2 * M_PI;
 
-void fft(double* output, double* input, size_t len)
+void fft(Complex_t* output, number_t* input, size_t len)
 {
 }
 
-void ifft(double* output, double* input, size_t len)
+void ifft(number_t* output, Complex_t* input, size_t len)
 {
+    
 }
 
-void dft(double* output, double* input, size_t len)
+void dft(Complex_t* output, number_t* input, size_t len)
 {
-    for (size_t i = 0;i < len;i += 2)
+    number_t tmp = PI_2 / len;
+    for (size_t i = 0;i < len;i++)
     {
-        double real = 0, image = 0;
+        number_t real = 0, image = 0;
+        number_t w = tmp * i;
         for (size_t j = 0;j < len;j++)
         {
-            double arg = PI_2 * ((double) (i * j) / (double) len);
-            real += input[j] * sin(arg);
-            image += input[j] * cos(arg);
+            number_t arg = j * w;
+            real += input[j] * cos(arg);
+            image -= input[j] * sin(arg);
         }
-        output[i] = real;
-        output[i + 1] = image;
+        output[i].real = real;
+        output[i].image = image;
     }
 }
