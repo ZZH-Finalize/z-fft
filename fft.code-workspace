@@ -1,0 +1,70 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+    },
+    "tasks": {
+        "version": "2.0.0",
+        "tasks": [
+            {
+                "label": "configure",
+                "type": "cmake",
+                "command": "configure",
+                "presentation": {
+                    "panel": "shared",
+                    "clear": true,
+                    "close": true
+                }
+            },
+            {
+                "label": "build",
+                "type": "cmake",
+                "command": "build",
+                "problemMatcher": "$gcc",
+                "dependsOn": "configure",
+                "group": {
+                    "kind": "build",
+                    "isDefault": true
+                },
+                "presentation": {
+                    "echo": true,
+                    "panel": "shared",
+                    "clear": true
+                }
+            },
+            {
+                "label": "clean",
+                "type": "cmake",
+                "command": "clean",
+                "isBackground": true,
+                "presentation": {
+                    "panel": "shared",
+                    "clear": true,
+                    "close": true,
+                    "reveal": "silent"
+                }
+            },
+            {
+                "label": "run",
+                "type": "shell",
+                "command": "./z_fft",
+                "options": {
+                    "cwd": "${workspaceFolder}/build"
+                },
+                "presentation": {
+                    "panel": "shared",
+                    "clear": true,
+                    "focus": true
+                },
+                "group": {
+                    "kind": "test",
+                    "isDefault": true
+                }
+            }
+        ]
+    }
+}
