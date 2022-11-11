@@ -14,8 +14,10 @@ extern "C" {
 #endif // __cplusplus
 
 
-    void fft(void* output, void* input, size_t len);
-    void ifft(void* output, void* input, size_t len);
+    void fft(double* output, double* input, size_t len);
+    void ifft(double* output, double* input, size_t len);
+    void dft(double* output, double* input, size_t len);
+    void idft(double* output, double* input, size_t len);
 
 #ifdef __cplusplus
 }
