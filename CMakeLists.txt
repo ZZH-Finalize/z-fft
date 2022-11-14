@@ -3,6 +3,8 @@ project(z_fft LANGUAGES C)
 
 add_definitions(-DBASIC_TYPE=double)
 
+include_directories(.)
+
 add_library(fft SHARED
     fft.c
 )
