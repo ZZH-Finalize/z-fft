@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 project(z_fft LANGUAGES C)
 
-add_definitions(-DBASIC_TYPE=double)
+if(NOT ${ZFFT_BASIC_TYPE} STREQUAL "")
+    message("Using extenal type")
+    add_definitions(-DBASIC_TYPE=${ZFFT_BASIC_TYPE})
+else()
+    add_definitions(-DBASIC_TYPE=double)
+endif()
 
 include_directories(.)
 

@@ -12,7 +12,7 @@
 
 int main(const int argc, const char** argv)
 {
-    double input[N];
+    number_t input[N];
     for (int i = 0;i < N;i++)
     {
         double arg = 2 * M_PI * i / FS;
@@ -30,7 +30,7 @@ int main(const int argc, const char** argv)
     //     printf("[%d]: %llf+%llfi\r\n", i, out[i].real, out[i].image);
     // }
 
-    double out2[N];
+    number_t out2[N];
 
     length(out2, out, N / 2);
 
