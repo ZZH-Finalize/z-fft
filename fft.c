@@ -20,7 +20,7 @@ void ifft(number_t* output, Complex_t* input, size_t len)
 void dft(Complex_t* output, number_t* input, size_t len)
 {
     number_t tmp = PI_2 / len;
-    for (size_t i = 0;i < len;i++)
+    for (size_t i = 0;i < len / 2;i++)
     {
         number_t real = 0, image = 0;
         number_t w = tmp * i;
@@ -33,4 +33,10 @@ void dft(Complex_t* output, number_t* input, size_t len)
         output[i].real = real;
         output[i].image = image;
     }
+}
+
+void length(number_t* output, Complex_t* input, size_t len)
+{
+    for (size_t i = 0;i < len;i++)
+        output[i] = sqrt(input[i].real * input[i].real + input[i].image * input[i].image);
 }

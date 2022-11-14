@@ -29,6 +29,8 @@ extern "C" {
     void dft(Complex_t* output, number_t* input, size_t len);
     void idft(number_t* output, Complex_t* input, size_t len);
 
+    void length(number_t* output, Complex_t* input, size_t len);
+
 #ifdef __cplusplus
 }
 #endif // __cplusplus
