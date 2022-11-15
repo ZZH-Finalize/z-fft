@@ -46,7 +46,7 @@ void idft(number_t* output, Complex_t* input, size_t len)
             number_t arg = j * w;
             res += input[j].real * cos(arg) - input[j].image * sin(arg);
         }
-        output[i] = res / len;
+        output[i] = res;
     }
 }
 

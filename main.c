@@ -41,6 +41,11 @@ int main(const int argc, const char** argv)
 
     for (int i = 0;i < N;i++)
     {
+        out2[i] /= N;
+    }
+
+    for (int i = 0;i < N;i++)
+    {
         printf("orig[%d]: %llf, idft[%d]: %llf\r\n", i, input[i], i, out2[i]);
     }
 
