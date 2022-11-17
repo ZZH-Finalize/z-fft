@@ -1,13 +1,14 @@
 /*
 @file: fft.h
 @author: ZZH
-@time: 2022-11-05 17:09:49
+@date: 2022-11-05
 @info: fft
 */
 #pragma once
 #include <stdint.h>
 #include <math.h>
 
+//可以通过构建系统传入的宏定义替换此处的类型
 #ifndef BASIC_TYPE
 #define BASIC_TYPE float
 #endif

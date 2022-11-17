@@ -1,7 +1,7 @@
 /*
 @file: fft.c
 @author: ZZH
-@time: 2022-11-05 17:10:13
+@date: 2022-11-05
 @info: fft实现
 */
 #include "fft.h"
