@@ -22,3 +22,10 @@ add_executable(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} fft)
+
+# 另一个测试案例
+add_executable(benchmark
+    benchmark.c
+)
+
+target_link_libraries(benchmark fft)

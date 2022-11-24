@@ -66,5 +66,31 @@
                 }
             }
         ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "debug",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/build/z_fft.exe",
+                "args": [],
+                // "stopAtEntry": true,
+                "cwd": "${workspaceFolder}/build",
+                "environment": [],
+                "externalConsole": true,
+                "MIMode": "gdb",
+                "miDebuggerPath": "D:/Qt/Tools/mingw810_32/bin/gdb.exe",
+                // "miDebuggerPath": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "为 gdb 启用整齐打印",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            }
+        ]
     }
 }
