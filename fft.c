@@ -57,7 +57,7 @@ static __attribute__((pure)) size_t reverseBits(size_t num, uint8_t bitsOfVar)
     return num;
 }
 
-void fft(Complex_t* output, number_t* input, size_t len)
+void fft(Complex_t* output, Number_t* input, size_t len)
 {
     if (len < 2)
         return;
@@ -78,21 +78,21 @@ void fft(Complex_t* output, number_t* input, size_t len)
     }
 
     //进行蝶形运算
-    //WpN = e^-i*PI_2*p/N = cos(PI_2*p/N) - i*sin(PI_2*p/N) (i为虚数单位)
-    //蝶形运算为 A=A+B*WpN B=A-B*WpN (A,B 均为复数,且等号左侧的A,B为下次迭代的值, 等号右侧的为本次的值)
+    //W(p, N) = e^-i*PI_2*p/N = cos(PI_2*p/N) - i*sin(PI_2*p/N) (i为虚数单位, N是变换点数, 相当于len变量)
+    //蝶形运算为 A=A+B*W(p, N) B=A-B*W(p, N) (A,B 均为复数,且等号左侧的A,B为下次迭代的值, 等号右侧的为本次的值)
     for (size_t i = 0;i < binLen;i++)
     {
         size_t step = 1 << i;//数据间隔, 每层蝶形运算取数的间隔不同
 
-        //相同旋转因子的数量和数据间隔是一致的, 比如第一层全是W0N(p=0)
-        for (size_t j = 0;j < step;j++)//循环计算所有旋转因子
+        //相同旋转因子的数量和数据间隔是一致的, 比如第一层全是W(0, N), 因此相同旋转因子只有1种, 而第一层取数的间隔也是1 
+        for (size_t j = 0;j < step;j++)//循环计算所有相同旋转因子
         {
-            size_t k = 1 << binLen - i - 1;//旋转因子增量, 比如 W0N 到 W2N 增量为2
+            size_t k = 1 << binLen - i - 1;//旋转因子增量, 比如 W(0, N) 到 W(2, N) 增量为2
             size_t p = j * k;//第j个旋转指数
 
-            number_t arg = PI_2 * p / len;
-            number_t sv = sin(arg);
-            number_t cv = cos(arg);
+            Number_t arg = PI_2 * p / len;
+            Number_t sv = sin(arg);
+            Number_t cv = cos(arg);
 
             for (size_t z = 0;z < k;z++)//
             {
@@ -100,9 +100,9 @@ void fft(Complex_t* output, number_t* input, size_t len)
                 //参与蝶形运算的实际就三个数, A B W, 其中A和B都是上一次迭代的输出值, W是旋转因子, 也就是那个展开是sin cos的公式
                 pComplex_t pA = &output[wStep], pB = pA + step;
 
-                //这个就相当于是B*WpN, tr结果的实数部分, ti是结果的虚数部分
-                number_t tr = pB->real * cv + pB->image * sv;
-                number_t ti = pB->image * cv - pB->real * sv;
+                //这个就相当于是B*W(p, N), tr结果的实数部分, ti是结果的虚数部分
+                Number_t tr = pB->real * cv + pB->image * sv;
+                Number_t ti = pB->image * cv - pB->real * sv;
 
                 //蝶形运算是A=A+B*WpN B=A-B*WpN,所以这里还得把A加进来
                 pB->real = pA->real - tr;
@@ -114,20 +114,20 @@ void fft(Complex_t* output, number_t* input, size_t len)
     }
 }
 
-void ifft(number_t* output, Complex_t* input, size_t len)
+void ifft(Number_t* output, Complex_t* input, size_t len)
 {
 }
 
-void dft(Complex_t* output, number_t* input, size_t len)
+void dft(Complex_t* output, Number_t* input, size_t len)
 {
-    number_t tmp = PI_2 / len;
+    Number_t tmp = PI_2 / len;
     for (size_t i = 0;i < len;i++)
     {
-        number_t real = 0, image = 0;
-        number_t w = tmp * i;
+        Number_t real = 0, image = 0;
+        Number_t w = tmp * i;
         for (size_t j = 0;j < len;j++)
         {
-            number_t arg = j * w;
+            Number_t arg = j * w;
             real += input[j] * cos(arg);
             image -= input[j] * sin(arg);
         }
@@ -136,23 +136,23 @@ void dft(Complex_t* output, number_t* input, size_t len)
     }
 }
 
-void idft(number_t* output, Complex_t* input, size_t len)
+void idft(Number_t* output, Complex_t* input, size_t len)
 {
-    number_t tmp = PI_2 / len;
+    Number_t tmp = PI_2 / len;
     for (size_t i = 0;i < len;i++)
     {
-        number_t res = 0;
-        number_t w = tmp * i;
+        Number_t res = 0;
+        Number_t w = tmp * i;
         for (size_t j = 0;j < len;j++)
         {
-            number_t arg = j * w;
+            Number_t arg = j * w;
             res += input[j].real * cos(arg) - input[j].image * sin(arg);
         }
         output[i] = res;
     }
 }
 
-void length(number_t* output, Complex_t* input, size_t len)
+void length(Number_t* output, Complex_t* input, size_t len)
 {
     for (size_t i = 0;i < len;i++)
         output[i] = sqrt(input[i].real * input[i].real + input[i].image * input[i].image);

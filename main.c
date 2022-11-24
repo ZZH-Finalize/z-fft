@@ -14,7 +14,7 @@
 int main(const int argc, const char** argv)
 {
     //构建一个含有多频率成分的信号
-    number_t input[N];
+    Number_t input[N];
     for (int i = 0;i < N;i++)
     {
         double arg = 2 * M_PI * i / FS;
@@ -26,7 +26,7 @@ int main(const int argc, const char** argv)
     //傅立叶正变换, 把input的信号变为复数频谱, 输出数据体积会比输入大一倍
     dft(out, input, N);
 
-    number_t out2[N];
+    Number_t out2[N];
 
     //对复数频谱求模得到实数, 这些实数就是每个频率下的信号强度
     length(out2, out, N);

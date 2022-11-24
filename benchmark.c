@@ -16,7 +16,7 @@
 int main(const int argc, const char** argv)
 {
     //构建一个含有多频率成分的信号
-    number_t input[N];
+    Number_t input[N];
     for (int i = 0;i < N;i++)
     {
         double arg = 2 * M_PI * i / FS;

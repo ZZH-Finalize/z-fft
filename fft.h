@@ -17,20 +17,20 @@
 extern "C" {
 #endif // __cplusplus
 
-    typedef BASIC_TYPE number_t;
+    typedef BASIC_TYPE Number_t;
 
     typedef struct
     {
-        number_t real;
-        number_t image;
+        Number_t real;
+        Number_t image;
     }Complex_t, * pComplex_t;
 
-    void fft(Complex_t* output, number_t* input, size_t len);
-    void ifft(number_t* output, Complex_t* input, size_t len);
-    void dft(Complex_t* output, number_t* input, size_t len);
-    void idft(number_t* output, Complex_t* input, size_t len);
+    void fft(Complex_t* output, Number_t* input, size_t len);
+    void ifft(Number_t* output, Complex_t* input, size_t len);
+    void dft(Complex_t* output, Number_t* input, size_t len);
+    void idft(Number_t* output, Complex_t* input, size_t len);
 
-    void length(number_t* output, Complex_t* input, size_t len);
+    void length(Number_t* output, Complex_t* input, size_t len);
 
 #ifdef __cplusplus
 }
