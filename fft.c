@@ -78,35 +78,58 @@ void fft(Complex_t* output, Number_t* input, size_t len)
     }
 
     //进行蝶形运算
-    //W(p, N) = e^-i*PI_2*p/N = cos(PI_2*p/N) - i*sin(PI_2*p/N) (i为虚数单位, N是变换点数, 相当于len变量)
-    //蝶形运算为 A=A+B*W(p, N) B=A-B*W(p, N) (A,B 均为复数,且等号左侧的A,B为下次迭代的值, 等号右侧的为本次的值)
-    for (size_t i = 0;i < binLen;i++)
+    //蝶形运算所用到的变量有:
+    //binLen - 总共需要进行几层运算(也就是蝶形图上有多少个列)
+    //level - 当前进行的是第几层运算
+    //group - 本层运算分为几组(也就是蝶形图中比较靠近的交点)
+    //cg - current group, 也就是当前是第几组
+    //inGroup - 每组内有多少个蝶形运算
+    //cig - 当前是组内的第几个运算
+    //step - 每个蝶形运算里, 参与运算的A和B之间的下标差
+    //numOfFactors - 本层运算内包括多少个旋转因子, 也就是多少个不同的W(p ,N), W和N都是固定的, 其实就是多少个不同的p
+    //cf - current factor, 当前是第几个旋转因子
+    //p - W(p, N)里的p, N就是len, W是一个表达式, 带入p和N之后可以得到一个复数
+    //numOfSameFactors - 相同的旋转因子出现了多少次, 比如第一层实际上只有一个旋转因子, 它就出现了group次
+    for (size_t level = 1;level <= binLen;level++)//迭代计算所有的层
     {
-        size_t step = 1 << i;//数据间隔, 每层蝶形运算取数的间隔不同
+        //以下规律通过观察蝶形图总结得到
+        size_t group = 1 << (binLen - level);//每层内的组数是2^(总层数-当前层数)
+        size_t inGroup = 1 << (level - 1);//每组内的运算数量是2^当前层数-1
+        size_t step = inGroup;//取数的间隔和组内运算数量一致
+        size_t numOfFactors = inGroup;//不同种类的旋转因子的数量和组内运算数量一致
+        size_t numOfSameFactors = group;//同种类的旋转因子的数量和组的数量一致
 
-        //相同旋转因子的数量和数据间隔是一致的, 比如第一层全是W(0, N), 因此相同旋转因子只有1种, 而第一层取数的间隔也是1 
-        for (size_t j = 0;j < step;j++)//循环计算所有相同旋转因子
+        for (size_t cf = 0;cf < numOfFactors;cf++)//遍历使用所有不同的旋转因子参与计算
         {
-            size_t k = 1 << binLen - i - 1;//旋转因子增量, 比如 W(0, N) 到 W(2, N) 增量为2
-            size_t p = j * k;//第j个旋转指数
+            //这里通过观察蝶形图可以发现, p的变化规律就是每次增长group
+            //前面也说过, 不同的旋转因子也就是不同的p
+            size_t p = cf * group;
+            Number_t omega = PI_2 * p / len;//这里就是2pi*p/N, 也就是准备传递给三角函数的参数omega
 
-            Number_t arg = PI_2 * p / len;
-            Number_t sv = sin(arg);
-            Number_t cv = cos(arg);
+            //W(p, N)是指数表达式的简写, 也就是e^-j*omega
+            //指数表达式可以用欧拉公式变为一般形式, 也就是cos(omega) - j*sin(omega), j不是数字而是虚数
+            //所以所谓的W(p, N)也就是一个实部为cos(omega), 虚部为-sin(omega)的复数而已
+            Complex_t w = { cos(omega), -sin(omega) };//计算W(p, N)
 
-            for (size_t z = 0;z < k;z++)//
+            //将当前旋转因子在本层内所需要参与的运算全部算出来, 这里就是用同一个w去取不同的A和B取计算
+            for (size_t csf = 0; csf < numOfSameFactors; csf++)
             {
-                size_t wStep = j + 2 * step * z;
-                //参与蝶形运算的实际就三个数, A B W, 其中A和B都是上一次迭代的输出值, W是旋转因子, 也就是那个展开是sin cos的公式
-                pComplex_t pA = &output[wStep], pB = pA + step;
+                //计算本次运算取的第一个数的下标
+                size_t indexA = step * 2 * csf + cf;
+                pComplex_t pA = &output[indexA], pB = &output[indexA + step];
 
-                //这个就相当于是B*W(p, N), tr结果的实数部分, ti是结果的虚数部分
-                Number_t tr = pB->real * cv + pB->image * sv;
-                Number_t ti = pB->image * cv - pB->real * sv;
+                //蝶形运算是三个数参与算出两个数, 表达式为:
+                //A(n) = A(n-1) + B(n-1) * W(p, N)
+                //B(n) = A(n-1) + B(n-1) * W(p, N)
+                //最终要计算的就是A(n)和B(n), W(p, N)上面已经算好了, 而A(n-1)和B(n-1)是上次算出来的值, 也是已经算好的
+                //这里先算B(n-1) * W(p, N), 这是一个复数乘法, 所以要算实部tr和虚部ti
+                //复数乘法的计算为B*W = (B.real*W.real - B.image*W.image) + (B.real*W.image + B.image*W.real)i
+                Number_t tr = pB->real * w.real - pB->image * w.image;
+                Number_t ti = pB->real * w.image + pB->image * w.real;
 
-                //蝶形运算是A=A+B*WpN B=A-B*WpN,所以这里还得把A加进来
+                //上面算的是B*W(p, N), 所以这里还得把A加进来
                 pB->real = pA->real - tr;
-                pB->image = pA->image - ti;
+                pB->image = pA->image - ti;//先B后A是因为A不能被覆盖, B公式里面的A代表的是本次的A而不是下一次的A
                 pA->real = pA->real + tr;
                 pA->image = pA->image + ti;
             }
@@ -116,6 +139,81 @@ void fft(Complex_t* output, Number_t* input, size_t len)
 
 void ifft(Number_t* output, Complex_t* input, size_t len)
 {
+    if (len < 2)
+        return;
+
+    uint8_t binLen = ff1(len) - 1;//首位二进制1的下标相当于求某个数的二进制长度, 例如1024的二进制长度是10
+    if (len & (len - 1))//计算长度如果不是2的N次幂
+        len = 1 << binLen;//求下一级的变换, 例如1023长度这里会当做512点数去计算, 1025会当做1024点数
+
+    //重排序
+    for (size_t i = 0;i < len;i++)
+    {
+        size_t rIndex = reverseBits(i, binLen);
+        //交换顺序的同时输出到output, 后续在output上原地进行蝶形运算
+        Complex_t tmp = input[i];
+        input[i] = input[rIndex];
+        input[rIndex] = tmp;
+    }
+
+    //进行蝶形运算
+    //蝶形运算所用到的变量有:
+    //binLen - 总共需要进行几层运算(也就是蝶形图上有多少个列)
+    //level - 当前进行的是第几层运算
+    //group - 本层运算分为几组(也就是蝶形图中比较靠近的交点)
+    //cg - current group, 也就是当前是第几组
+    //inGroup - 每组内有多少个蝶形运算
+    //cig - 当前是组内的第几个运算
+    //step - 每个蝶形运算里, 参与运算的A和B之间的下标差
+    //numOfFactors - 本层运算内包括多少个旋转因子, 也就是多少个不同的W(p ,N), W和N都是固定的, 其实就是多少个不同的p
+    //cf - current factor, 当前是第几个旋转因子
+    //p - W(p, N)里的p, N就是len, W是一个表达式, 带入p和N之后可以得到一个复数
+    //numOfSameFactors - 相同的旋转因子出现了多少次, 比如第一层实际上只有一个旋转因子, 它就出现了group次
+    for (size_t level = 1;level <= binLen;level++)//迭代计算所有的层
+    {
+        //以下规律通过观察蝶形图总结得到
+        size_t group = 1 << (binLen - level);//每层内的组数是2^(总层数-当前层数)
+        size_t inGroup = 1 << (level - 1);//每组内的运算数量是2^当前层数-1
+        size_t step = inGroup;//取数的间隔和组内运算数量一致
+        size_t numOfFactors = inGroup;//不同种类的旋转因子的数量和组内运算数量一致
+        size_t numOfSameFactors = group;//同种类的旋转因子的数量和组的数量一致
+
+        for (size_t cf = 0;cf < numOfFactors;cf++)//遍历使用所有不同的旋转因子参与计算
+        {
+            //这里通过观察蝶形图可以发现, p的变化规律就是每次增长group
+            //前面也说过, 不同的旋转因子也就是不同的p
+            size_t p = cf * group;
+            Number_t omega = PI_2 * p / len;//这里就是2pi*p/N, 也就是准备传递给三角函数的参数omega
+
+            //W(-p, N)是指数表达式的简写, 也就是e^j*omega
+            //指数表达式可以用欧拉公式变为一般形式, 也就是cos(omega) + j*sin(omega), j不是数字而是虚数
+            //所以所谓的W(p, N)也就是一个实部为cos(omega), 虚部为sin(omega)的复数而已
+            Complex_t w = { cos(omega), sin(omega) };//计算W(p, N)
+
+            //将当前旋转因子在本层内所需要参与的运算全部算出来, 这里就是用同一个w去取不同的A和B取计算
+            for (size_t csf = 0; csf < numOfSameFactors; csf++)
+            {
+                //计算本次运算取的第一个数的下标
+                size_t indexA = step * 2 * csf + cf;
+                pComplex_t pA = &input[indexA], pB = &input[indexA + step];
+
+                //蝶形运算是三个数参与算出两个数, 表达式为:
+                //A(n) = A(n-1) + B(n-1) * W(p, N)
+                //B(n) = A(n-1) + B(n-1) * W(p, N)
+                //最终要计算的就是A(n)和B(n), W(p, N)上面已经算好了, 而A(n-1)和B(n-1)是上次算出来的值, 也是已经算好的
+                //这里先算B(n-1) * W(p, N), 这是一个复数乘法, 所以要算实部tr和虚部ti
+                //复数乘法的计算为B*W = (B.real*W.real - B.image*W.image) + (B.real*W.image + B.image*W.real)i
+                Number_t tr = pB->real * w.real - pB->image * w.image;
+                Number_t ti = pB->real * w.image + pB->image * w.real;
+
+                //上面算的是B*W(p, N), 所以这里还得把A加进来
+                pB->real = pA->real - tr;
+                pB->image = pA->image - ti;//先B后A是因为A不能被覆盖, B公式里面的A代表的是本次的A而不是下一次的A
+                pA->real = pA->real + tr;
+                pA->image = pA->image + ti;
+            }
+        }
+    }
 }
 
 void dft(Complex_t* output, Number_t* input, size_t len)
