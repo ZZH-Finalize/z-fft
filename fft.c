@@ -120,7 +120,7 @@ void fft(Complex_t* output, Number_t* input, size_t len)
 
                 //蝶形运算是三个数参与算出两个数, 表达式为:
                 //A(n) = A(n-1) + B(n-1) * W(p, N)
-                //B(n) = A(n-1) + B(n-1) * W(p, N)
+                //B(n) = A(n-1) - B(n-1) * W(p, N)
                 //最终要计算的就是A(n)和B(n), W(p, N)上面已经算好了, 而A(n-1)和B(n-1)是上次算出来的值, 也是已经算好的
                 //这里先算B(n-1) * W(p, N), 这是一个复数乘法, 所以要算实部tr和虚部ti
                 //复数乘法的计算为B*W = (B.real*W.real - B.image*W.image) + (B.real*W.image + B.image*W.real)i
@@ -201,7 +201,7 @@ void ifft(Number_t* output, Complex_t* input, size_t len)
 
                 //蝶形运算是三个数参与算出两个数, 表达式为:
                 //A(n) = A(n-1) + B(n-1) * W(-p, N)
-                //B(n) = A(n-1) + B(n-1) * W(-p, N)
+                //B(n) = A(n-1) - B(n-1) * W(-p, N)
                 //最终要计算的就是A(n)和B(n), W(-p, N)上面已经算好了, 而A(n-1)和B(n-1)是上次算出来的值, 也是已经算好的
                 //这里先算B(n-1) * W(-p, N), 这是一个复数乘法, 所以要算实部tr和虚部ti
                 //复数乘法的计算为B*W = (B.real*W.real - B.image*W.image) + (B.real*W.image + B.image*W.real)i
