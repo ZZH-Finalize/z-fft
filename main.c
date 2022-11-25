@@ -8,7 +8,7 @@
 #include <string.h>
 #include "fft.h"
 
-#define N 8
+#define N 128
 #define FS 5000
 
 int main(const int argc, const char** argv)

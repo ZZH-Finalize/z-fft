@@ -146,16 +146,16 @@ void ifft(Number_t* output, Complex_t* input, size_t len)
     if (len & (len - 1))//计算长度如果不是2的N次幂
         len = 1 << binLen;//求下一级的变换, 例如1023长度这里会当做512点数去计算, 1025会当做1024点数
 
-    pComplex_t po = (pComplex_t) output;
     //重排序
-    for (size_t i = 0;i < len / 2;i++)//这里一次移动了虚部和实部, 所以只能换一半, 否则每个数会回到原来的位置, 相当于没换
+    for (size_t i = 0;i < len;i++)//这里一次移动了虚部和实部, 所以只能换一半, 否则每个数会回到原来的位置, 相当于没换
     {
         size_t rIndex = reverseBits(i, binLen);
-        po[i] = input[rIndex];
-        po[rIndex] = input[i];
-        // Complex_t tmp = input[i];
-        // input[i] = input[rIndex];
-        // input[rIndex] = tmp;
+        if (i < rIndex)
+        {
+            Complex_t tmp = input[i];
+            input[i] = input[rIndex];
+            input[rIndex] = tmp;
+        }
     }
 
     //进行蝶形运算, 与fft不同的是, 这里使用W(p, N)的共轭复数W(-p, N), 这样就可以得到原始数据
@@ -197,7 +197,7 @@ void ifft(Number_t* output, Complex_t* input, size_t len)
             {
                 //计算本次运算取的第一个数的下标
                 size_t indexA = step * 2 * csf + cf, indexB = indexA + step;
-                pComplex_t pA = &po[indexA], pB = &po[indexB];
+                pComplex_t pA = &input[indexA], pB = &input[indexB];
 
                 //蝶形运算是三个数参与算出两个数, 表达式为:
                 //A(n) = A(n-1) + B(n-1) * W(-p, N)
