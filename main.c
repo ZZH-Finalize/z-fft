@@ -8,7 +8,7 @@
 #include <string.h>
 #include "fft.h"
 
-#define N 128
+#define N 8
 #define FS 5000
 
 int main(const int argc, const char** argv)
@@ -24,7 +24,7 @@ int main(const int argc, const char** argv)
     Complex_t out[N];
     
     //傅立叶正变换, 把input的信号变为复数频谱, 输出数据体积会比输入大一倍
-    dft(out, input, N);
+    fft(out, input, N);
 
     Number_t out2[N];
 
@@ -42,7 +42,7 @@ int main(const int argc, const char** argv)
     // memset(&out[N / 2], 0, sizeof(out) / 2);
 
     //傅立叶反变换, 输入刚才得到的复数频谱, 输出实数信号, 这里的out2理论上应该和最初的input是一样的信号, 但是幅值被放大了N倍
-    idft(out2, out, N);
+    ifft(out2, out, N);
 
     for (int i = 0;i < N;i++)
     {

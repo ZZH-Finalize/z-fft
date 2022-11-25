@@ -146,17 +146,19 @@ void ifft(Number_t* output, Complex_t* input, size_t len)
     if (len & (len - 1))//计算长度如果不是2的N次幂
         len = 1 << binLen;//求下一级的变换, 例如1023长度这里会当做512点数去计算, 1025会当做1024点数
 
+    pComplex_t po = (pComplex_t) output;
     //重排序
-    for (size_t i = 0;i < len;i++)
+    for (size_t i = 0;i < len / 2;i++)//这里一次移动了虚部和实部, 所以只能换一半, 否则每个数会回到原来的位置, 相当于没换
     {
         size_t rIndex = reverseBits(i, binLen);
-        //交换顺序的同时输出到output, 后续在output上原地进行蝶形运算
-        Complex_t tmp = input[i];
-        input[i] = input[rIndex];
-        input[rIndex] = tmp;
+        po[i] = input[rIndex];
+        po[rIndex] = input[i];
+        // Complex_t tmp = input[i];
+        // input[i] = input[rIndex];
+        // input[rIndex] = tmp;
     }
 
-    //进行蝶形运算
+    //进行蝶形运算, 与fft不同的是, 这里使用W(p, N)的共轭复数W(-p, N), 这样就可以得到原始数据
     //蝶形运算所用到的变量有:
     //binLen - 总共需要进行几层运算(也就是蝶形图上有多少个列)
     //level - 当前进行的是第几层运算
@@ -165,9 +167,9 @@ void ifft(Number_t* output, Complex_t* input, size_t len)
     //inGroup - 每组内有多少个蝶形运算
     //cig - 当前是组内的第几个运算
     //step - 每个蝶形运算里, 参与运算的A和B之间的下标差
-    //numOfFactors - 本层运算内包括多少个旋转因子, 也就是多少个不同的W(p ,N), W和N都是固定的, 其实就是多少个不同的p
+    //numOfFactors - 本层运算内包括多少个旋转因子, 也就是多少个不同的W(-p ,N), W和N都是固定的, 其实就是多少个不同的p
     //cf - current factor, 当前是第几个旋转因子
-    //p - W(p, N)里的p, N就是len, W是一个表达式, 带入p和N之后可以得到一个复数
+    //p - W(-p, N)里的p, N就是len, W是一个表达式, 带入p和N之后可以得到一个复数
     //numOfSameFactors - 相同的旋转因子出现了多少次, 比如第一层实际上只有一个旋转因子, 它就出现了group次
     for (size_t level = 1;level <= binLen;level++)//迭代计算所有的层
     {
@@ -187,30 +189,33 @@ void ifft(Number_t* output, Complex_t* input, size_t len)
 
             //W(-p, N)是指数表达式的简写, 也就是e^j*omega
             //指数表达式可以用欧拉公式变为一般形式, 也就是cos(omega) + j*sin(omega), j不是数字而是虚数
-            //所以所谓的W(p, N)也就是一个实部为cos(omega), 虚部为sin(omega)的复数而已
-            Complex_t w = { cos(omega), sin(omega) };//计算W(p, N)
+            //所以所谓的W(-p, N)也就是一个实部为cos(omega), 虚部为sin(omega)的复数而已
+            Complex_t w = { cos(omega), sin(omega) };//计算W(-p, N)
 
             //将当前旋转因子在本层内所需要参与的运算全部算出来, 这里就是用同一个w去取不同的A和B取计算
             for (size_t csf = 0; csf < numOfSameFactors; csf++)
             {
                 //计算本次运算取的第一个数的下标
-                size_t indexA = step * 2 * csf + cf;
-                pComplex_t pA = &input[indexA], pB = &input[indexA + step];
+                size_t indexA = step * 2 * csf + cf, indexB = indexA + step;
+                pComplex_t pA = &po[indexA], pB = &po[indexB];
 
                 //蝶形运算是三个数参与算出两个数, 表达式为:
-                //A(n) = A(n-1) + B(n-1) * W(p, N)
-                //B(n) = A(n-1) + B(n-1) * W(p, N)
-                //最终要计算的就是A(n)和B(n), W(p, N)上面已经算好了, 而A(n-1)和B(n-1)是上次算出来的值, 也是已经算好的
-                //这里先算B(n-1) * W(p, N), 这是一个复数乘法, 所以要算实部tr和虚部ti
+                //A(n) = A(n-1) + B(n-1) * W(-p, N)
+                //B(n) = A(n-1) + B(n-1) * W(-p, N)
+                //最终要计算的就是A(n)和B(n), W(-p, N)上面已经算好了, 而A(n-1)和B(n-1)是上次算出来的值, 也是已经算好的
+                //这里先算B(n-1) * W(-p, N), 这是一个复数乘法, 所以要算实部tr和虚部ti
                 //复数乘法的计算为B*W = (B.real*W.real - B.image*W.image) + (B.real*W.image + B.image*W.real)i
                 Number_t tr = pB->real * w.real - pB->image * w.image;
                 Number_t ti = pB->real * w.image + pB->image * w.real;
 
-                //上面算的是B*W(p, N), 所以这里还得把A加进来
+                //上面算的是B*W(-p, N), 所以这里还得把A加进来
                 pB->real = pA->real - tr;
                 pB->image = pA->image - ti;//先B后A是因为A不能被覆盖, B公式里面的A代表的是本次的A而不是下一次的A
                 pA->real = pA->real + tr;
                 pA->image = pA->image + ti;
+
+                output[indexA] = pA->real;
+                output[indexB] = pB->real;
             }
         }
     }
