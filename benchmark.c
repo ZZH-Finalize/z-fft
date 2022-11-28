@@ -10,7 +10,9 @@
 #include <time.h>
 #include "fft.h"
 
+#ifndef N
 #define N 16384//此N值在我的电脑上, dft需要22秒多才能算出结果, 但同等条件fft仅需3毫秒
+#endif // !N
 #define FS 5000
 
 int main(const int argc, const char** argv)
@@ -33,8 +35,9 @@ int main(const int argc, const char** argv)
     fft(out2, input, N);
     clock_t fftEnd = clock();
 
-    printf("dft cost: %d, fft cost: %d\r\n", dftEnd - dftStart, fftEnd - fftStart);
+    clock_t dftCost = dftEnd - dftStart, fftCost = fftEnd - fftStart;
 
-    return 0;
+    printf("dft cost: %d, fft cost: %d\r\n", dftCost, fftCost);
 
+    return dftCost > fftCost ? 0 : -1;
 }

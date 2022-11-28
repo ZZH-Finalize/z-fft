@@ -31,8 +31,6 @@ int main(const int argc, const char** argv)
     //对复数频谱求模得到实数, 这些实数就是每个频率下的信号强度
     length(out2, out, N);
 
-    printf("length:\r\n");
-
     //打印幅度谱, 方框内将下标解算为实际频率, 后跟信号强度
     for (int i = 0;i < N / 2;i++)
     {
@@ -49,11 +47,15 @@ int main(const int argc, const char** argv)
         out2[i] /= N;
     }
 
+    uint8_t res = 0;
     //输出原始信号和频谱反变换回来的信号, 这两个信号应该是完全一样的才正确
     for (int i = 0;i < N;i++)
     {
         printf("orig[%d]: %llf, idft[%d]: %llf\r\n", i, input[i], i, out2[i]);
+
+        if (-1 != res && fabs(input[i] - out2[i]) > 0.001)//误差不超过0.001
+            res = -1;//否则认为是还原失败
     }
 
-    return 0;
+    return res;
 }

@@ -37,6 +37,21 @@
                 }
             },
             {
+                "label": "test",
+                "type": "cmake",
+                "command": "test",
+                "problemMatcher": "$gcc",
+                "presentation": {
+                    "echo": true,
+                    "panel": "shared",
+                    "clear": true
+                },
+                "group": {
+                    "kind": "test",
+                    "isDefault": true
+                }
+            },
+            {
                 "label": "clean",
                 "type": "cmake",
                 "command": "clean",
@@ -51,7 +66,7 @@
             {
                 "label": "run",
                 "type": "shell",
-                "command": "./z_fft",
+                "command": "./demo",
                 "options": {
                     "cwd": "${workspaceFolder}/build"
                 },
@@ -59,10 +74,6 @@
                     "panel": "shared",
                     "clear": true,
                     "focus": true
-                },
-                "group": {
-                    "kind": "test",
-                    "isDefault": true
                 }
             }
         ]
@@ -74,7 +85,7 @@
                 "name": "debug",
                 "type": "cppdbg",
                 "request": "launch",
-                "program": "${workspaceFolder}/build/z_fft.exe",
+                "program": "${workspaceFolder}/build/demo.exe",
                 "args": [],
                 // "stopAtEntry": true,
                 "cwd": "${workspaceFolder}/build",
