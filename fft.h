@@ -25,10 +25,19 @@ extern "C" {
         Number_t image;
     }Complex_t, * pComplex_t;
 
-    void fft(Complex_t* output, Number_t* input, size_t len);
-    void ifft(Number_t* output, Complex_t* input, size_t len);
-    void dft(Complex_t* output, Number_t* input, size_t len);
-    void idft(Number_t* output, Complex_t* input, size_t len);
+    //复数变换使用output的内存空间进行蝶形运算
+    void fft(Complex_t* output, Complex_t* input, size_t len);
+    void ifft(Complex_t* output, Complex_t* input, size_t len);
+
+    //实数变换的正变换使用output的内存空间, 反变换使用input的内存空间. 也就是说实数反变换会改变输入的复数值
+    void rfft(Complex_t* output, Number_t* input, size_t len);
+    void irfft(Number_t* output, Complex_t* input, size_t len);
+
+    void dft(Complex_t* output, Complex_t* input, size_t len);
+    void idft(Complex_t* output, Complex_t* input, size_t len);
+
+    void rdft(Complex_t* output, Number_t* input, size_t len);
+    void irdft(Number_t* output, Complex_t* input, size_t len);
 
     void length(Number_t* output, Complex_t* input, size_t len);
 

@@ -28,11 +28,11 @@ int main(const int argc, const char** argv)
     Complex_t out1[N], out2[N];
 
     clock_t dftStart = clock();
-    dft(out1, input, N);
+    rdft(out1, input, N);
     clock_t dftEnd = clock();
 
     clock_t fftStart = clock();
-    fft(out2, input, N);
+    rfft(out2, input, N);
     clock_t fftEnd = clock();
 
     clock_t dftCost = dftEnd - dftStart, fftCost = fftEnd - fftStart;

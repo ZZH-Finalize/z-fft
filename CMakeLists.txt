@@ -40,3 +40,7 @@ add_testcase(demo
 add_testcase(benchmark_fast
     benchmark_fast.c
 )
+
+add_testcase(complex_test
+    complex_test.c
+)
