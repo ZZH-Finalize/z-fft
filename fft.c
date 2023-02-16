@@ -19,7 +19,7 @@ static __attribute__((pure)) uint8_t ff1(size_t num)
     uint8_t bitsOfVar = sizeof(num) * 8;//通过sizeof实现自适应
     uint8_t index = 1;
 
-    //这里执行的时候变量的位数已经固定了, 所以实际上是O(1), 32位固定循环5次, 64位固定循环6次
+    //编译之后变量的位数已经固定了, 所以执行的时候实际上是O(1)效率, 32位固定循环5次, 64位固定循环6次
     while (bitsOfVar)
     {
         bitsOfVar /= 2;
@@ -73,7 +73,7 @@ static void butterfly(Complex_t* buf, size_t len, int flag)
     //step - 每个蝶形运算里, 参与运算的A和B之间的下标差
     //numOfFactors - 本层运算内包括多少个旋转因子, 也就是多少个不同的W(p ,N), W和N都是固定的, 其实就是多少个不同的p
     //cf - current factor, 当前是第几个旋转因子
-    //p - W(p, N)里的p, N就是len, W是一个表达式, 带入p和N之后可以得到一个复数
+    //p - W(p, N)里的p, N就是len, W是一个表达式, 代入p和N之后可以得到一个复数
     //numOfSameFactors - 相同的旋转因子出现了多少次, 比如第一层实际上只有一个旋转因子, 它就出现了group次
     for (size_t level = 1;level <= binLen;level++)//迭代计算所有的层
     {
@@ -92,7 +92,7 @@ static void butterfly(Complex_t* buf, size_t len, int flag)
             Number_t omega = p * PI_2_Len;//这里就是2pi*p/N, 也就是准备传递给三角函数的参数omega
 
             //W(p, N)是指数表达式的简写, 也就是e^-j*omega
-            //指数表达式可以用欧拉公式变为一般形式, 也就是cos(omega) - j*sin(omega), j不是数字而是虚数
+            //指数表达式可以用欧拉公式变为一般形式, 也就是cos(omega) - j*sin(omega), j不是数字而是虚数单位
             //所以所谓的W(p, N)也就是一个实部为cos(omega), 虚部为-sin(omega)的复数而已
             Complex_t w = { cos(omega), flag * sin(omega) };//计算W(p, N)或W(p, -N)
 
