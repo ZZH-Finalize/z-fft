@@ -18,8 +18,8 @@ int main(const int argc, const char** argv)
     for (int i = 0;i < N;i++)
     {
         double arg = 2 * M_PI * i / FS;
-        input[i].real = sin(70 * arg) + sin(800 * arg) + sin(2200 * arg);//I路数据
-        input[i].image = cos(70 * arg) + cos(800 * arg) + cos(2200 * arg);//Q路数据
+        input[i].real = cos(70 * arg) + cos(800 * arg) + cos(2200 * arg);//I路数据
+        input[i].image = sin(70 * arg) + sin(800 * arg) + sin(2200 * arg);//Q路数据
     }
 
     Complex_t out[N];
