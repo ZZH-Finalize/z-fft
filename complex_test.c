@@ -54,7 +54,7 @@ int main(const int argc, const char** argv)
     //输出原始信号和频谱反变换回来的信号, 这两个信号应该是完全一样的才正确
     for (int i = 0;i < N;i++)
     {
-        printf("orig[%d]: %llf+%llfi, idft[%d]: %llf+%llfi\r\n",
+        printf("orig[%d]: %llf+%llfi, ifft[%d]: %llf+%llfi\r\n",
             i, input[i].real, input[i].image,
             i, out3[i].real, out3[i].image
         );

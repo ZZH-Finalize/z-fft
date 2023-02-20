@@ -2,7 +2,29 @@
 
 此仓库提供了一个简单易用的傅立叶变换库, 主要提供了9个接口, 分别为`fft`、`ifft`、`rfft`、`irfft`、`dft`、`idft`、`rdft`、`irdft`和`length`, 前8个都是进行傅立叶变换的接口, 最后一个是复数求模函数(用于计算幅度谱)
 
-上述8个接口可以大致分为`fft`和`dft`两类, `fft`以及所有基于`fft`派生出来的接口均为基2的DIT算法实现的快速变换, 而`dft`以及所有基于`dft`派生出的接口均为傅立叶变换的定义式实现, 两大类在功能上并无差异, 但数据量较大时, `fft`这一类的要比`dft`这一类的运算速度快的多
+本仓库自带测试用例和demo程序, 例如[complex_test.c](complex_test.c)、[benchmark.c](benchmark.c)和[demo.c](demo.c)
+
+[demo.c](demo.c)提供了实数傅里叶变换接口的用例, 此用例合成了一个包含三种频率的信号, 然后调用接口计算得到幅度谱, 再使用反变换接口将频谱还原回到原始信号, 并进行检查, 确保反变换还原的信号与原始信号是一致的, 此demo运行结果如下
+
+第一段输出是幅度谱, 格式为`[频率]: 信号强度`
+
+第二段输出是原信号和ifft重建的信号, 格式为`orig: 原信号采样值, ifft: ifft重建的采样值`
+
+![demo输出1](readme_rc/demo_res1.png)  
+![demo输出2](readme_rc/demo_res2.png)
+
+[complex_test.c](complex_test.c)与[demo.c](demo.c)类似, 不同之处在于, [complex_test.c](complex_test.c)产生的是复数信号, 调用的也是复数变换的接口, 其余行为与[demo.c](demo.c)一致
+
+![复数demo1](readme_rc/complex_res1.png)  
+![复数demo2](readme_rc/complex_res2.png)
+
+[benchmark.c](benchmark.c)则提供了`dft`与`fft`性能上的差异对比, 此测试案例分别调用`dft`和`fft`的接口, 做相同的**16384**点的变换, 并统计两个算法使用的时间(单位为毫秒), 运行结果如下
+
+![性能对比](readme_rc/benchmark_res.png)
+
+其中的数字单位为毫秒, 因此可以看出, `dft`花费了**22492**毫秒才计算完成, 而同样的数据量`fft`仅使用**3**毫秒
+
+前文所述的8个接口可以大致分为`fft`和`dft`两类, `fft`以及所有基于`fft`派生出来的接口均为基2的DIT算法实现的快速变换, 而`dft`以及所有基于`dft`派生出的接口均为傅立叶变换的定义式实现, 两大类在功能上并无差异, 但数据量较大时, `fft`这一类的要比`dft`这一类的运算速度快的多
 
 接口的命名规则为:
 

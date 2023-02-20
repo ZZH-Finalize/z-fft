@@ -51,7 +51,7 @@ int main(const int argc, const char** argv)
     //输出原始信号和频谱反变换回来的信号, 这两个信号应该是完全一样的才正确
     for (int i = 0;i < N;i++)
     {
-        printf("orig[%d]: %llf, idft[%d]: %llf\r\n", i, input[i], i, out2[i]);
+        printf("orig[%d]: %llf, ifft[%d]: %llf\r\n", i, input[i], i, out2[i]);
 
         if (-1 != res && fabs(input[i] - out2[i]) > 0.001)//误差不超过0.001
             res = -1;//否则认为是还原失败
