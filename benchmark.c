@@ -37,7 +37,7 @@ int main(const int argc, const char** argv)
 
     clock_t dftCost = dftEnd - dftStart, fftCost = fftEnd - fftStart;
 
-    printf("dft cost: %d, fft cost: %d\r\n", dftCost, fftCost);
+    printf("dft cost: %ld, fft cost: %ld\r\n", dftCost, fftCost);
 
     return dftCost > fftCost ? 0 : -1;
 }

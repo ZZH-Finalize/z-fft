@@ -35,7 +35,7 @@ int main(const int argc, const char** argv)
     //打印幅度谱, 方框内将下标解算为实际频率, 后跟信号强度
     for (int i = 0;i < N / 2;i++)
     {
-        printf("[%llf]: %llf\r\n", i * (double) FS / N, out2[i]);
+        printf("[%lf]: %lf\r\n", i * (double) FS / N, out2[i]);
     }
 
     // memset(&out[N / 2], 0, sizeof(out) / 2);
@@ -50,19 +50,17 @@ int main(const int argc, const char** argv)
         out3[i].image /= N;
     }
 
-    uint8_t res = 0;
+    int8_t res = 0;
     //输出原始信号和频谱反变换回来的信号, 这两个信号应该是完全一样的才正确
     for (int i = 0;i < N;i++)
     {
-        printf("orig[%d]: %llf+%llfi, ifft[%d]: %llf+%llfi\r\n",
+        printf("orig[%d]: %lf+%lfi, ifft[%d]: %lf+%lfi\r\n",
             i, input[i].real, input[i].image,
             i, out3[i].real, out3[i].image
         );
 
-        if (-1 != res &&
-                fabs(input[i].real - out3[i].real) > 0.001 ||
-                fabs(input[i].image - out3[i].image) > 0.001
-            )//误差不超过0.001
+        if (fabs(input[i].real - out3[i].real) > 0.001 ||
+            fabs(input[i].image - out3[i].image) > 0.001)//误差不超过0.001
             res = -1;//否则认为是还原失败
     }
 
